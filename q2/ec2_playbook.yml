@@ -1,0 +1,29 @@
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  
+  vars:
+    instance_name: myinstance
+    sg_id: sg-514efc39
+    region: eu-west-2
+    instance_type: t2.small
+    ami: ami-fcc4db98
+    keypair: mark
+    subnet: subnet-cbf3a8b0
+    # IAM instance role to allow S3 bucket access
+    instance_role: devops-test-instance-role 
+  tasks:
+    - name: Create Instance
+      ec2:
+        key_name: "{{ keypair }}"
+        instance_type: "{{ instance_type}}"
+        image: "{{ ami }}"
+        region: "{{ region }}"
+        group_id: "{{ sg_id }}"
+        instance_profile_name: "{{ instance_role }}"
+        wait: yes
+        count: 1
+        vpc_subnet_id: "{{ subnet }}"
+        assign_public_ip: no
+        instance_tags:
+            Name: "{{ instance_name }}"
